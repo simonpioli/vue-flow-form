@@ -13,6 +13,7 @@ export const QuestionType = Object.freeze({
   LongText: 'FlowFormLongTextType',
   MultipleChoice: 'FlowFormMultipleChoiceType',
   MultiplePictureChoice: 'FlowFormMultiplePictureChoiceType',
+  MultipleText: 'FlowFormMultipleTextType',
   Number: 'FlowFormNumberType',
   Password: 'FlowFormPasswordType',
   Phone: 'FlowFormPhoneType',
