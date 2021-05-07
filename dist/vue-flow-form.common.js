@@ -76,7 +76,8 @@ var QuestionType = Object.freeze({
   Phone: 'FlowFormPhoneType',
   SectionBreak: 'FlowFormSectionBreakType',
   Text: 'FlowFormTextType',
-  Url: 'FlowFormUrlType'
+  Url: 'FlowFormUrlType',
+  ValidatedPhone: 'FlowFormValidatedPhoneType',
 });
 
 var DropdownOptionBlank = Object.freeze({
@@ -157,6 +158,7 @@ var QuestionModel = function QuestionModel(options) {
   this.max = null;
   this.maxLength = null;
   this.nextStepOnAnswer = false;
+  this.remoteValidationMethod = null;
 
   Object.assign(this, options);
 
@@ -2130,9 +2132,89 @@ var __vue_script__$b = script$b;
     undefined
   );
 
+var script$c = {
+  extends: __vue_component__$3,
+  name: QuestionType.ValidatedPhone,
+  data: function data() {
+    return {
+      inputType: 'tel',
+      canReceiveFocus: true
+    }
+  },
+  methods: {
+    validate: function validate() {
+      var valid = !this.question.required || this.hasValue;
+      if (this.hasValue && this.question.remoteValidationMethod !== null) {
+        var self = this;
+        var remoteResult = this.question.remoteValidationMethod(this.dataValue);
+        console.log(remoteResult);
+        if (remoteResult) {
+          console.log('Pass');
+          return true;
+        } else {
+          console.log('Fail');
+          self.$emit('send-validation-message', 'Please enter a valid UK phone number.');
+          return false;
+        }
+      }
+      if (!valid) {
+        this.$emit('send-validation-message', 'Please enter a phone number.');
+      }
+      return valid;
+    },
+
+    // validateRemote() {
+    //   let response = false;
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.open('POST', this.question.validationEndpoint);
+    //   xhr.setRequestHeader('Content-Type', 'application/json');
+    //   xhr.onreadystatechange = function() {
+    //     if (xhr.status === 200) {
+    //       response = JSON.parse(xhr.responseText);
+    //     }
+    //   }
+    //   return response;
+    // }
+  }
+};
+
+/* script */
+var __vue_script__$c = script$c;
+
+/* template */
+
+  /* style */
+  var __vue_inject_styles__$c = undefined;
+  /* scoped */
+  var __vue_scope_id__$c = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$c = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$c = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
+
+  
+  var __vue_component__$c = /*#__PURE__*/normalizeComponent(
+    {},
+    __vue_inject_styles__$c,
+    __vue_script__$c,
+    __vue_scope_id__$c,
+    __vue_is_functional_template__$c,
+    __vue_module_identifier__$c,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
+
 //
 
-var script$c = {
+var script$d = {
   extends: __vue_component__,
   name: QuestionType.SectionBreak,
   methods: {
@@ -2149,7 +2231,7 @@ var script$c = {
 };
 
 /* script */
-var __vue_script__$c = script$c;
+var __vue_script__$d = script$d;
 
 /* template */
 var __vue_render__$6 = function() {
@@ -2168,13 +2250,13 @@ var __vue_staticRenderFns__$6 = [];
 __vue_render__$6._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$c = undefined;
+  var __vue_inject_styles__$d = undefined;
   /* scoped */
-  var __vue_scope_id__$c = undefined;
+  var __vue_scope_id__$d = undefined;
   /* module identifier */
-  var __vue_module_identifier__$c = undefined;
+  var __vue_module_identifier__$d = undefined;
   /* functional template */
-  var __vue_is_functional_template__$c = false;
+  var __vue_is_functional_template__$d = false;
   /* style inject */
   
   /* style inject SSR */
@@ -2183,20 +2265,20 @@ __vue_render__$6._withStripped = true;
   
 
   
-  var __vue_component__$c = /*#__PURE__*/normalizeComponent(
+  var __vue_component__$d = /*#__PURE__*/normalizeComponent(
     { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
-    __vue_inject_styles__$c,
-    __vue_script__$c,
-    __vue_scope_id__$c,
-    __vue_is_functional_template__$c,
-    __vue_module_identifier__$c,
+    __vue_inject_styles__$d,
+    __vue_script__$d,
+    __vue_scope_id__$d,
+    __vue_is_functional_template__$d,
+    __vue_module_identifier__$d,
     false,
     undefined,
     undefined,
     undefined
   );
 
-var script$d = {
+var script$e = {
   extends: __vue_component__$3,
   name: QuestionType.Url,
   data: function data() {
@@ -2228,63 +2310,6 @@ var script$d = {
       }
 
       return !this.question.required
-    }
-  }
-};
-
-/* script */
-var __vue_script__$d = script$d;
-
-/* template */
-
-  /* style */
-  var __vue_inject_styles__$d = undefined;
-  /* scoped */
-  var __vue_scope_id__$d = undefined;
-  /* module identifier */
-  var __vue_module_identifier__$d = undefined;
-  /* functional template */
-  var __vue_is_functional_template__$d = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-  /* style inject shadow dom */
-  
-
-  
-  var __vue_component__$d = /*#__PURE__*/normalizeComponent(
-    {},
-    __vue_inject_styles__$d,
-    __vue_script__$d,
-    __vue_scope_id__$d,
-    __vue_is_functional_template__$d,
-    __vue_module_identifier__$d,
-    false,
-    undefined,
-    undefined,
-    undefined
-  );
-
-var script$e = {
-  extends: __vue_component__$3,
-  name: QuestionType.Date,
-  data: function data() {
-    return {
-      inputType: 'date'
-    }
-  }, 
-  methods: {
-    validate: function validate() {
-      if (this.question.min && this.dataValue < this.question.min) {
-        return false
-      }
-
-      if (this.question.max && this.dataValue > this.question.max) {
-        return false
-      }
-
-      return !this.question.required || this.hasValue
     }
   }
 };
@@ -2323,13 +2348,70 @@ var __vue_script__$e = script$e;
     undefined
   );
 
+var script$f = {
+  extends: __vue_component__$3,
+  name: QuestionType.Date,
+  data: function data() {
+    return {
+      inputType: 'date'
+    }
+  }, 
+  methods: {
+    validate: function validate() {
+      if (this.question.min && this.dataValue < this.question.min) {
+        return false
+      }
+
+      if (this.question.max && this.dataValue > this.question.max) {
+        return false
+      }
+
+      return !this.question.required || this.hasValue
+    }
+  }
+};
+
+/* script */
+var __vue_script__$f = script$f;
+
+/* template */
+
+  /* style */
+  var __vue_inject_styles__$f = undefined;
+  /* scoped */
+  var __vue_scope_id__$f = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$f = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$f = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
+
+  
+  var __vue_component__$f = /*#__PURE__*/normalizeComponent(
+    {},
+    __vue_inject_styles__$f,
+    __vue_script__$f,
+    __vue_scope_id__$f,
+    __vue_is_functional_template__$f,
+    __vue_module_identifier__$f,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
+
 //
 
 
-var script$f = {
+var script$g = {
   name: 'FlowFormQuestion',
   components: {
-    FlowFormDateType: __vue_component__$e,
+    FlowFormDateType: __vue_component__$f,
     FlowFormDropdownType: __vue_component__$1,
     FlowFormEmailType: __vue_component__$4,
     FlowFormLongTextType: __vue_component__$6,
@@ -2338,9 +2420,10 @@ var script$f = {
     FlowFormNumberType: __vue_component__$9,
     FlowFormPasswordType: __vue_component__$a,
     FlowFormPhoneType: __vue_component__$b,
-    FlowFormSectionBreakType: __vue_component__$c,
+    FlowFormSectionBreakType: __vue_component__$d,
     FlowFormTextType: __vue_component__$3,
-    FlowFormUrlType: __vue_component__$d
+    FlowFormUrlType: __vue_component__$e,
+    FlowFormValidatedPhoneType: __vue_component__$c,
   },
   props: {
     question: QuestionModel,
@@ -2362,7 +2445,8 @@ var script$f = {
     return {
       QuestionType: QuestionType,
       dataValue: null,
-      debounced: false
+      debounced: false,
+      validationMessage: this.language.invalidPrompt,
     }
   },
   mounted: function mounted() {
@@ -2380,7 +2464,7 @@ var script$f = {
      */
     focusField: function focusField() {
       var el = this.$refs.questionComponent;
-      
+
       el && el.focus();
     },
 
@@ -2404,7 +2488,7 @@ var script$f = {
 
     /**
      * Emits "answer" event and calls "onEnter" method on Enter press
-     */ 
+     */
     onEnter: function onEnter($event) {
       this.checkAnswer(this.emitAnswer);
     },
@@ -2437,7 +2521,7 @@ var script$f = {
       if (q && this.question.type !== QuestionType.Date) {
         this.returnFocus();
         this.$emit('answer', q);
-        
+
         q.onEnter();
       }
     },
@@ -2445,13 +2529,13 @@ var script$f = {
     debounce: function debounce(fn, delay) {
       var debounceTimer;
       this.debounced = true;
-    
+
       return (function () {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(fn, delay);
       })()
     },
-    
+
     /**
      * Check if the "OK" button should be shown.
      */
@@ -2473,7 +2557,7 @@ var script$f = {
       if (QuestionType.MultipleChoice && !this.question.multiple && this.question.nextStepOnAnswer) {
         return false
       }
-    
+
       // If there is no question referenced, or dataValue is still set to its default (null).
       // This allows a ChoiceOption value of false, but will not allow you to use null as a value.
       if (!q || this.dataValue === null) {
@@ -2502,6 +2586,16 @@ var script$f = {
       }
 
       return q.showInvalid()
+    },
+
+    setValidationMessage: function setValidationMessage(message) {
+      if ( message === void 0 ) message = '';
+
+      if (message !== '') {
+        this.validationMessage = message;
+      } else {
+        this.validationMessage = this.language.invalidPrompt;
+      }
     }
   },
   computed: {
@@ -2519,26 +2613,26 @@ var script$f = {
 
         classes['field-' + this.question.type.toLowerCase().substring(8, this.question.type.length - 4)] = true;
 
-        return classes
+        return classes;
       }
     },
 
     showHelperText: function showHelperText() {
       if (this.question.subtitle) {
-        return true
+        return true;
       }
 
       if (this.question.type === QuestionType.LongText || this.question.type === QuestionType.MultipleChoice) {
-        return this.question.helpTextShow
+        return this.question.helpTextShow;
       }
 
-      return false
+      return false;
     }
   }
 };
 
 /* script */
-var __vue_script__$f = script$f;
+var __vue_script__$g = script$g;
 
 /* template */
 var __vue_render__$7 = function() {
@@ -2623,7 +2717,11 @@ var __vue_render__$7 = function() {
                                         language: _vm.language,
                                         active: _vm.active
                                       },
-                                      on: { next: _vm.onEnter },
+                                      on: {
+                                        next: _vm.onEnter,
+                                        sendValidationMessage:
+                                          _vm.setValidationMessage
+                                      },
                                       model: {
                                         value: _vm.dataValue,
                                         callback: function($$v) {
@@ -2665,19 +2763,23 @@ var __vue_render__$7 = function() {
                       _vm.question.multiple
                         ? _c("span", { staticClass: "f-help" }, [
                             _vm._v(
-                              _vm._s(
-                                _vm.question.helpText ||
-                                  _vm.language.multipleChoiceHelpText
-                              )
+                              "\n              " +
+                                _vm._s(
+                                  _vm.question.helpText ||
+                                    _vm.language.multipleChoiceHelpText
+                                ) +
+                                "\n          "
                             )
                           ])
                         : _vm.question.type === _vm.QuestionType.MultipleChoice
                         ? _c("span", { staticClass: "f-help" }, [
                             _vm._v(
-                              _vm._s(
-                                _vm.question.helpText ||
-                                  _vm.language.multipleChoiceHelpTextSingle
-                              )
+                              "\n                  " +
+                                _vm._s(
+                                  _vm.question.helpText ||
+                                    _vm.language.multipleChoiceHelpTextSingle
+                                ) +
+                                "\n          "
                             )
                           ])
                         : _vm._e()
@@ -2697,7 +2799,10 @@ var __vue_render__$7 = function() {
                             language: _vm.language,
                             active: _vm.active
                           },
-                          on: { next: _vm.onEnter },
+                          on: {
+                            next: _vm.onEnter,
+                            sendValidationMessage: _vm.setValidationMessage
+                          },
                           model: {
                             value: _vm.dataValue,
                             callback: function($$v) {
@@ -2797,7 +2902,7 @@ var __vue_render__$7 = function() {
                 staticClass: "f-invalid",
                 attrs: { role: "alert", "aria-live": "assertive" }
               },
-              [_vm._v(_vm._s(_vm.language.invalidPrompt))]
+              [_vm._v("\n      " + _vm._s(_vm.validationMessage) + "\n    ")]
             )
           : _vm._e()
       ])
@@ -2808,13 +2913,13 @@ var __vue_staticRenderFns__$7 = [];
 __vue_render__$7._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$f = undefined;
+  var __vue_inject_styles__$g = undefined;
   /* scoped */
-  var __vue_scope_id__$f = undefined;
+  var __vue_scope_id__$g = undefined;
   /* module identifier */
-  var __vue_module_identifier__$f = undefined;
+  var __vue_module_identifier__$g = undefined;
   /* functional template */
-  var __vue_is_functional_template__$f = false;
+  var __vue_is_functional_template__$g = false;
   /* style inject */
   
   /* style inject SSR */
@@ -2823,13 +2928,13 @@ __vue_render__$7._withStripped = true;
   
 
   
-  var __vue_component__$f = /*#__PURE__*/normalizeComponent(
+  var __vue_component__$g = /*#__PURE__*/normalizeComponent(
     { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
-    __vue_inject_styles__$f,
-    __vue_script__$f,
-    __vue_scope_id__$f,
-    __vue_is_functional_template__$f,
-    __vue_module_identifier__$f,
+    __vue_inject_styles__$g,
+    __vue_script__$g,
+    __vue_scope_id__$g,
+    __vue_is_functional_template__$g,
+    __vue_module_identifier__$g,
     false,
     undefined,
     undefined,
@@ -2838,10 +2943,10 @@ __vue_render__$7._withStripped = true;
 
 //
 
-var script$g = {
+var script$h = {
   name: 'FlowForm',
   components: {
-    FlowFormQuestion: __vue_component__$f
+    FlowFormQuestion: __vue_component__$g
   },
   
   props: {
@@ -3417,7 +3522,7 @@ var script$g = {
 };
 
 /* script */
-var __vue_script__$g = script$g;
+var __vue_script__$h = script$h;
 /* template */
 var __vue_render__$8 = function() {
   var _vm = this;
@@ -3702,13 +3807,13 @@ var __vue_staticRenderFns__$8 = [];
 __vue_render__$8._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$g = undefined;
+  var __vue_inject_styles__$h = undefined;
   /* scoped */
-  var __vue_scope_id__$g = undefined;
+  var __vue_scope_id__$h = undefined;
   /* module identifier */
-  var __vue_module_identifier__$g = undefined;
+  var __vue_module_identifier__$h = undefined;
   /* functional template */
-  var __vue_is_functional_template__$g = false;
+  var __vue_is_functional_template__$h = false;
   /* style inject */
   
   /* style inject SSR */
@@ -3717,20 +3822,20 @@ __vue_render__$8._withStripped = true;
   
 
   
-  var __vue_component__$g = /*#__PURE__*/normalizeComponent(
+  var __vue_component__$h = /*#__PURE__*/normalizeComponent(
     { render: __vue_render__$8, staticRenderFns: __vue_staticRenderFns__$8 },
-    __vue_inject_styles__$g,
-    __vue_script__$g,
-    __vue_scope_id__$g,
-    __vue_is_functional_template__$g,
-    __vue_module_identifier__$g,
+    __vue_inject_styles__$h,
+    __vue_script__$h,
+    __vue_scope_id__$h,
+    __vue_is_functional_template__$h,
+    __vue_module_identifier__$h,
     false,
     undefined,
     undefined,
     undefined
   );
 
-var script$h = {
+var script$i = {
   name: 'Question',
   
   data: function data() {
@@ -3751,18 +3856,18 @@ var script$h = {
 };
 
 /* script */
-var __vue_script__$h = script$h;
+var __vue_script__$i = script$i;
 
 /* template */
 
   /* style */
-  var __vue_inject_styles__$h = undefined;
+  var __vue_inject_styles__$i = undefined;
   /* scoped */
-  var __vue_scope_id__$h = undefined;
+  var __vue_scope_id__$i = undefined;
   /* module identifier */
-  var __vue_module_identifier__$h = undefined;
+  var __vue_module_identifier__$i = undefined;
   /* functional template */
-  var __vue_is_functional_template__$h = undefined;
+  var __vue_is_functional_template__$i = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -3771,13 +3876,13 @@ var __vue_script__$h = script$h;
   
 
   
-  var __vue_component__$h = /*#__PURE__*/normalizeComponent(
+  var __vue_component__$i = /*#__PURE__*/normalizeComponent(
     {},
-    __vue_inject_styles__$h,
-    __vue_script__$h,
-    __vue_scope_id__$h,
-    __vue_is_functional_template__$h,
-    __vue_module_identifier__$h,
+    __vue_inject_styles__$i,
+    __vue_script__$i,
+    __vue_scope_id__$i,
+    __vue_is_functional_template__$i,
+    __vue_module_identifier__$i,
     false,
     undefined,
     undefined,
@@ -3839,7 +3944,7 @@ es6ObjectAssign.polyfill();
 function install(Vue) {
   if (install.installed) { return }
   install.installed = true;
-  Vue.component('FlowForm', __vue_component__$g);
+  Vue.component('FlowForm', __vue_component__$h);
 }
 
 // Create module definition for Vue.use()
@@ -3862,8 +3967,8 @@ exports.ChoiceOption = ChoiceOption;
 exports.LanguageModel = LanguageModel;
 exports.LinkOption = LinkOption;
 exports.MaskPresets = MaskPresets;
-exports.Question = __vue_component__$h;
+exports.Question = __vue_component__$i;
 exports.QuestionModel = QuestionModel;
 exports.QuestionType = QuestionType;
-exports.default = __vue_component__$g;
+exports.default = __vue_component__$h;
 exports.install = install;

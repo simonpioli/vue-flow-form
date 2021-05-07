@@ -105,6 +105,7 @@ export default class QuestionModel {
     this.max = null
     this.maxLength = null
     this.nextStepOnAnswer = false
+    this.remoteValidationMethod = null;
 
     Object.assign(this, options)
 

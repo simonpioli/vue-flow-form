@@ -5,7 +5,6 @@
   https://www.ditdot.hr/en
 */
 
-import axios from "axios";
 import LanguageModel from '../../models/LanguageModel'
 import {QuestionType} from '../../models/QuestionModel'
 import TextType from './TextType.vue'
@@ -19,29 +18,40 @@ export default {
       canReceiveFocus: true
     }
   },
-  props: {
-    validationEndpoint: String
-  },
   methods: {
-    async validate() {
-      if (this.hasValue) {
+    validate() {
+      let valid = !this.question.required || this.hasValue;
+      if (this.hasValue && this.question.remoteValidationMethod !== null) {
         const self = this;
-        return await this.validateRemote()
-          .then(response => {
-            self.$emit('send-validation-message', 'Please enter a valid UK phone number.');
-            return response.data.result;
-          }).catch(error => {
-            console.error(error);
-            return false;
-          });
+        const remoteResult = this.question.remoteValidationMethod(this.dataValue);
+        console.log(remoteResult);
+        if (remoteResult) {
+          console.log('Pass');
+          return true;
+        } else {
+          console.log('Fail');
+          self.$emit('send-validation-message', 'Please enter a valid UK phone number.');
+          return false;
+        }
       }
-      this.$emit('send-validation-message', 'Please enter a phone number.');
-      return !this.question.required || this.hasValue;
+      if (!valid) {
+        this.$emit('send-validation-message', 'Please enter a phone number.');
+      }
+      return valid;
     },
 
-    validateRemote() {
-      return axios.post(this.validationEndpoint, this.dataValue);
-    }
+    // validateRemote() {
+    //   let response = false;
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.open('POST', this.question.validationEndpoint);
+    //   xhr.setRequestHeader('Content-Type', 'application/json');
+    //   xhr.onreadystatechange = function() {
+    //     if (xhr.status === 200) {
+    //       response = JSON.parse(xhr.responseText);
+    //     }
+    //   }
+    //   return response;
+    // }
   }
 }
 </script>
