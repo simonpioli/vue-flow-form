@@ -1,4 +1,5 @@
 import commonjs from '@rollup/plugin-commonjs'
+import npm from '@rollup/plugin-node-resolve';
 import vue from 'rollup-plugin-vue'
 import buble from '@rollup/plugin-buble'
 import resolve from '@rollup/plugin-node-resolve'
@@ -49,9 +50,15 @@ export default [
         ]
       }),
       css(),
+      npm({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
       buble({
         objectAssign: 'Object.assign',
-        jsx: 'h'
+        jsx: 'h',
+        transforms: { asyncAwait: false }
       }),
       commonjs(),
       resolve({
@@ -86,9 +93,15 @@ export default [
         ]
       }),
       css(),
+      npm({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
       buble({
         objectAssign: 'Object.assign',
-        jsx: 'h'
+        jsx: 'h',
+        transforms: { asyncAwait: false }
       }),
       commonjs(),
       resolve({
@@ -123,9 +136,15 @@ export default [
         ]
       }),
       css(),
+      npm({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
       buble({
         objectAssign: 'Object.assign',
-        jsx: 'h'
+        jsx: 'h',
+        transforms: { asyncAwait: false }
       }),
       commonjs(),
       resolve({
@@ -162,9 +181,15 @@ export default [
         minimize: true
       }),
       css(),
+      npm({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
       buble({
         objectAssign: 'Object.assign',
-        jsx: 'h'
+        jsx: 'h',
+        transforms: { asyncAwait: false }
       }),
       commonjs(),
       resolve({

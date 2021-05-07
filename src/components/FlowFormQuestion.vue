@@ -12,7 +12,13 @@
             <span class="f-text" v-else>
               {{ question.title }}&nbsp;
               <!-- Required questions are marked by an asterisk (*) -->
-              <span class="f-required" v-if="question.required" v-bind:aria-label="language.ariaRequired" role="note"><span aria-hidden="true">*</span></span>
+              <span
+                class="f-required"
+                v-if="question.required"
+                v-bind:aria-label="language.ariaRequired"
+                role="note">
+                  <span aria-hidden="true">*</span>
+              </span>
 
               <span v-if="question.inline" class="f-answer">
                 <component
@@ -23,18 +29,31 @@
                   v-model="dataValue"
                   v-bind:active="active"
                   v-on:next="onEnter"
+                  v-on:sendValidationMessage="setValidationMessage"
                 />
               </span>
-            </span>
+          </span>
           </template>
 
           <span class="f-sub" v-if="showHelperText">
             <span v-if="question.subtitle">{{ question.subtitle }}</span>
 
-            <span class="f-help" v-if="question.type === QuestionType.LongText && !isMobile" v-html="question.helpText || language.formatString(language.longTextHelpText)"></span>
+            <span
+              class="f-help"
+              v-if="question.type === QuestionType.LongText && !isMobile"
+              v-html="question.helpText || language.formatString(language.longTextHelpText)">
+            </span>
 
-            <span class="f-help" v-if="question.type === QuestionType.MultipleChoice && question.multiple">{{ question.helpText || language.multipleChoiceHelpText }}</span>
-            <span class="f-help" v-else-if="question.type === QuestionType.MultipleChoice">{{ question.helpText || language.multipleChoiceHelpTextSingle }}</span>
+            <span
+              class="f-help"
+              v-if="question.type === QuestionType.MultipleChoice && question.multiple">
+                {{ question.helpText || language.multipleChoiceHelpText }}
+            </span>
+            <span
+              class="f-help"
+              v-else-if="question.type === QuestionType.MultipleChoice">
+                    {{ question.helpText || language.multipleChoiceHelpTextSingle }}
+            </span>
           </span>
 
           <div v-if="!question.inline" class="f-answer f-full-width">
@@ -46,14 +65,15 @@
               v-model="dataValue"
               v-bind:active="active"
               v-on:next="onEnter"
+              v-on:sendValidationMessage="setValidationMessage"
             />
           </div>
         </div>
         <p v-if="question.description || question.descriptionLink.length !== 0" class="f-description">
           <span v-if="question.description">{{ question.description }}</span>
           <a
-            v-for="(link, index) in question.descriptionLink" 
-            class="f-link" 
+            v-for="(link, index) in question.descriptionLink"
+            class="f-link"
             v-bind:key="'m' + index"
             v-bind:href="link.url"
             v-bind:target="link.target"
@@ -62,7 +82,7 @@
 
       </div>
       <div class="vff-animate f-fade-in f-enter" v-if="showOkButton()">
-        <button 
+        <button
           class="o-btn-action"
           type="button"
           ref="button"
@@ -70,11 +90,11 @@
           v-on:click.prevent="onEnter"
           v-bind:aria-label="language.ariaOk"
         >
-            <span v-if="question.type === QuestionType.SectionBreak">{{ language.continue }}</span>
-            <span v-else-if="showSkip()">{{ language.skip }}</span>
-            <span v-else>{{ language.ok }}</span>
+          <span v-if="question.type === QuestionType.SectionBreak">{{ language.continue }}</span>
+          <span v-else-if="showSkip()">{{ language.skip }}</span>
+          <span v-else>{{ language.ok }}</span>
         </button>
-        <a 
+        <a
           class="f-enter-desc"
           href="#"
           v-if="question.type !== QuestionType.LongText || !isMobile"
@@ -83,243 +103,256 @@
         </a>
       </div>
 
-      <div v-if="showInvalid()" class="f-invalid" role="alert" aria-live="assertive">{{ language.invalidPrompt }}</div>
+      <div v-if="showInvalid()" class="f-invalid" role="alert" aria-live="assertive">
+        {{ validationMessage }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-  /*
-    Copyright (c) 2020 - present, DITDOT Ltd. - MIT Licence
-    https://github.com/ditdot-dev/vue-flow-form
-    https://www.ditdot.hr/en
-  */
+/*
+  Copyright (c) 2020 - present, DITDOT Ltd. - MIT Licence
+  https://github.com/ditdot-dev/vue-flow-form
+  https://www.ditdot.hr/en
+*/
 
-  import LanguageModel from '../models/LanguageModel'
-  import QuestionModel, { QuestionType, LinkOption } from '../models/QuestionModel'
-  import FlowFormDropdownType from './QuestionTypes/DropdownType.vue'
-  import FlowFormEmailType from './QuestionTypes/EmailType.vue'
-  import FlowFormLongTextType from './QuestionTypes/LongTextType.vue'
-  import FlowFormMultipleChoiceType from './QuestionTypes/MultipleChoiceType.vue'
-  import FlowFormMultiplePictureChoiceType from './QuestionTypes/MultiplePictureChoiceType.vue'
-  import FlowFormNumberType from './QuestionTypes/NumberType.vue'
-  import FlowFormPasswordType from './QuestionTypes/PasswordType.vue'
-  import FlowFormPhoneType from './QuestionTypes/PhoneType.vue'
-  import FlowFormSectionBreakType from './QuestionTypes/SectionBreakType.vue'
-  import FlowFormTextType from './QuestionTypes/TextType.vue'
-  import FlowFormUrlType from './QuestionTypes/UrlType.vue'
-  import FlowFormDateType from './QuestionTypes/DateType.vue'
-  import { IsMobile } from '../mixins/IsMobile'
-  
+import LanguageModel from '../models/LanguageModel'
+import QuestionModel, {QuestionType, LinkOption} from '../models/QuestionModel'
+import FlowFormDropdownType from './QuestionTypes/DropdownType.vue'
+import FlowFormEmailType from './QuestionTypes/EmailType.vue'
+import FlowFormLongTextType from './QuestionTypes/LongTextType.vue'
+import FlowFormMultipleChoiceType from './QuestionTypes/MultipleChoiceType.vue'
+import FlowFormMultiplePictureChoiceType from './QuestionTypes/MultiplePictureChoiceType.vue'
+import FlowFormNumberType from './QuestionTypes/NumberType.vue'
+import FlowFormPasswordType from './QuestionTypes/PasswordType.vue'
+import FlowFormPhoneType from './QuestionTypes/PhoneType.vue'
+import FlowFormValidatedPhoneType from './QuestionTypes/ValidatedPhoneType.vue';
+import FlowFormSectionBreakType from './QuestionTypes/SectionBreakType.vue'
+import FlowFormTextType from './QuestionTypes/TextType.vue'
+import FlowFormUrlType from './QuestionTypes/UrlType.vue'
+import FlowFormDateType from './QuestionTypes/DateType.vue'
+import {IsMobile} from '../mixins/IsMobile'
 
-  export default {
-    name: 'FlowFormQuestion',
-    components: {
-      FlowFormDateType,
-      FlowFormDropdownType,
-      FlowFormEmailType,
-      FlowFormLongTextType,
-      FlowFormMultipleChoiceType,
-      FlowFormMultiplePictureChoiceType,
-      FlowFormNumberType,
-      FlowFormPasswordType,
-      FlowFormPhoneType,
-      FlowFormSectionBreakType,
-      FlowFormTextType,
-      FlowFormUrlType
+
+export default {
+  name: 'FlowFormQuestion',
+  components: {
+    FlowFormDateType,
+    FlowFormDropdownType,
+    FlowFormEmailType,
+    FlowFormLongTextType,
+    FlowFormMultipleChoiceType,
+    FlowFormMultiplePictureChoiceType,
+    FlowFormNumberType,
+    FlowFormPasswordType,
+    FlowFormPhoneType,
+    FlowFormSectionBreakType,
+    FlowFormTextType,
+    FlowFormUrlType,
+    FlowFormValidatedPhoneType,
+  },
+  props: {
+    question: QuestionModel,
+    language: LanguageModel,
+    value: [String, Array, Boolean, Number, Object],
+    active: {
+      type: Boolean,
+      default: false
     },
-    props: {
-      question: QuestionModel,
-      language: LanguageModel,
-      value: [String, Array, Boolean, Number, Object],
-      active: {
-        type: Boolean,
-        default: false
-      },
-      reverse: {
-        type: Boolean,
-        default: false
-      }
+    reverse: {
+      type: Boolean,
+      default: false
+    }
+  },
+  mixins: [
+    IsMobile
+  ],
+  data() {
+    return {
+      QuestionType: QuestionType,
+      dataValue: null,
+      debounced: false,
+      validationMessage: this.language.invalidPrompt,
+    }
+  },
+  mounted() {
+    this.focusField()
+    this.dataValue = this.question.answer
+
+    this.$refs.qanimate.addEventListener('animationend', this.onAnimationEnd)
+  },
+  beforeDestroy() {
+    this.$refs.qanimate.removeEventListener('animationend', this.onAnimationEnd)
+  },
+  methods: {
+    /**
+     * Autofocus the input box of the current question
+     */
+    focusField() {
+      const el = this.$refs.questionComponent
+
+      el && el.focus()
     },
-    mixins: [
-      IsMobile
-    ],
-    data() {
-      return {
-        QuestionType: QuestionType,
-        dataValue: null,
-        debounced: false
-      }
-    },
-    mounted() {
+
+    onAnimationEnd() {
       this.focusField()
-      this.dataValue = this.question.answer
-
-      this.$refs.qanimate.addEventListener('animationend', this.onAnimationEnd)
     },
-    beforeDestroy() {
-      this.$refs.qanimate.removeEventListener('animationend', this.onAnimationEnd)
-    },
-    methods: {
-      /**
-       * Autofocus the input box of the current question
-       */
-      focusField() {
-        const el = this.$refs.questionComponent
-        
-        el && el.focus()
-      },
 
-      onAnimationEnd() {
+    shouldFocus() {
+      const q = this.$refs.questionComponent
+
+      return q && q.canReceiveFocus && !q.focused
+    },
+
+    returnFocus() {
+      const q = this.$refs.questionComponent
+
+      if (this.shouldFocus()) {
         this.focusField()
-      },
-
-      shouldFocus() {
-        const q = this.$refs.questionComponent
-
-        return q && q.canReceiveFocus && !q.focused
-      },
-
-      returnFocus() {
-        const q = this.$refs.questionComponent
-
-        if (this.shouldFocus()) {
-          this.focusField()
-        }
-      },
-
-      /**
-       * Emits "answer" event and calls "onEnter" method on Enter press
-       */ 
-      onEnter($event) {
-        this.checkAnswer(this.emitAnswer)
-      },
-
-      onTab($event) {
-        this.checkAnswer(this.emitAnswerTab)
-      },
-
-      checkAnswer(fn) {
-        const q = this.$refs.questionComponent
-
-        if (q.isValid() && this.question.nextStepOnAnswer && !this.question.multiple) {
-          this.debounce(() => fn(q), 350)
-        } else {
-          fn(q)
-        }
-      },
-
-      emitAnswer(q) {
-        if (q) {
-          if (!q.focused) {
-            this.$emit('answer', q)
-          }
-
-          q.onEnter()
-        }
-      },
-
-      emitAnswerTab(q) {
-        if (q && this.question.type !== QuestionType.Date) {
-          this.returnFocus()
-          this.$emit('answer', q)
-          
-          q.onEnter()
-        }
-      },
-
-      debounce(fn, delay) {
-        let debounceTimer
-        this.debounced = true
-      
-        return (() => {
-          clearTimeout(debounceTimer)
-          debounceTimer = setTimeout(fn, delay)
-        })()
-      },
-      
-      /**
-       * Check if the "OK" button should be shown.
-       */
-      showOkButton() {
-        const q = this.$refs.questionComponent
-
-        if (this.question.type === QuestionType.SectionBreak) {
-          return this.active
-        }
-
-        if (!this.question.required) {
-          return true
-        }
-
-        if (this.question.allowOther && this.question.other) {
-          return true
-        }
-
-        if (QuestionType.MultipleChoice && !this.question.multiple && this.question.nextStepOnAnswer) {
-          return false
-        }
-      
-        // If there is no question referenced, or dataValue is still set to its default (null).
-        // This allows a ChoiceOption value of false, but will not allow you to use null as a value.
-        if (!q || this.dataValue === null) {
-          return false
-        }
-
-        return q.hasValue && q.isValid()
-      },
-
-      showSkip() {
-        const q = this.$refs.questionComponent
-
-        // We might not have a reference to the question component at first
-        // but we know that if we don't, it's definitely empty
-        return !this.question.required && (!q || !q.hasValue)
-      },
-
-      /**
-       * Determins if the invalid message should be shown.
-       */
-      showInvalid() {
-        const q = this.$refs.questionComponent
-
-        if (!q || this.dataValue === null) {
-          return false
-        }
-
-        return q.showInvalid()
       }
     },
-    computed: {
-      mainClasses: {
-        cache: false,
-        get() {
-          const classes = {
-            'q-is-active': this.active,
-            'q-is-inactive': !this.active,
-            'f-fade-in-down': this.reverse,
-            'f-fade-in-up': !this.reverse,
-            'f-focused': this.$refs.questionComponent && this.$refs.questionComponent.focused,
-            'f-has-value': this.$refs.questionComponent && this.$refs.questionComponent.hasValue
-          }
 
-          classes['field-' + this.question.type.toLowerCase().substring(8, this.question.type.length - 4)] = true
+    /**
+     * Emits "answer" event and calls "onEnter" method on Enter press
+     */
+    onEnter($event) {
+      this.checkAnswer(this.emitAnswer)
+    },
 
-          return classes
+    onTab($event) {
+      this.checkAnswer(this.emitAnswerTab)
+    },
+
+    checkAnswer(fn) {
+      const q = this.$refs.questionComponent
+
+      if (q.isValid() && this.question.nextStepOnAnswer && !this.question.multiple) {
+        this.debounce(() => fn(q), 350)
+      } else {
+        fn(q)
+      }
+    },
+
+    emitAnswer(q) {
+      if (q) {
+        if (!q.focused) {
+          this.$emit('answer', q)
         }
-      },
 
-      showHelperText() {
-        if (this.question.subtitle) {
-          return true
-        }
+        q.onEnter()
+      }
+    },
 
-        if (this.question.type === QuestionType.LongText || this.question.type === QuestionType.MultipleChoice) {
-          return this.question.helpTextShow
-        }
+    emitAnswerTab(q) {
+      if (q && this.question.type !== QuestionType.Date) {
+        this.returnFocus()
+        this.$emit('answer', q)
 
+        q.onEnter()
+      }
+    },
+
+    debounce(fn, delay) {
+      let debounceTimer
+      this.debounced = true
+
+      return (() => {
+        clearTimeout(debounceTimer)
+        debounceTimer = setTimeout(fn, delay)
+      })()
+    },
+
+    /**
+     * Check if the "OK" button should be shown.
+     */
+    showOkButton() {
+      const q = this.$refs.questionComponent
+
+      if (this.question.type === QuestionType.SectionBreak) {
+        return this.active
+      }
+
+      if (!this.question.required) {
+        return true
+      }
+
+      if (this.question.allowOther && this.question.other) {
+        return true
+      }
+
+      if (QuestionType.MultipleChoice && !this.question.multiple && this.question.nextStepOnAnswer) {
         return false
       }
+
+      // If there is no question referenced, or dataValue is still set to its default (null).
+      // This allows a ChoiceOption value of false, but will not allow you to use null as a value.
+      if (!q || this.dataValue === null) {
+        return false
+      }
+
+      return q.hasValue && q.isValid()
+    },
+
+    showSkip() {
+      const q = this.$refs.questionComponent
+
+      // We might not have a reference to the question component at first
+      // but we know that if we don't, it's definitely empty
+      return !this.question.required && (!q || !q.hasValue)
+    },
+
+    /**
+     * Determins if the invalid message should be shown.
+     */
+    showInvalid() {
+      const q = this.$refs.questionComponent
+
+      if (!q || this.dataValue === null) {
+        return false
+      }
+
+      return q.showInvalid()
+    },
+
+    setValidationMessage(message = '') {
+      if (message !== '') {
+        this.validationMessage = message;
+      } else {
+        this.validationMessage = this.language.invalidPrompt;
+      }
+    }
+  },
+  computed: {
+    mainClasses: {
+      cache: false,
+      get() {
+        const classes = {
+          'q-is-active': this.active,
+          'q-is-inactive': !this.active,
+          'f-fade-in-down': this.reverse,
+          'f-fade-in-up': !this.reverse,
+          'f-focused': this.$refs.questionComponent && this.$refs.questionComponent.focused,
+          'f-has-value': this.$refs.questionComponent && this.$refs.questionComponent.hasValue
+        };
+
+        classes['field-' + this.question.type.toLowerCase().substring(8, this.question.type.length - 4)] = true;
+
+        return classes;
+      }
+    },
+
+    showHelperText() {
+      if (this.question.subtitle) {
+        return true;
+      }
+
+      if (this.question.type === QuestionType.LongText || this.question.type === QuestionType.MultipleChoice) {
+        return this.question.helpTextShow;
+      }
+
+      return false;
     }
   }
+}
 </script>
